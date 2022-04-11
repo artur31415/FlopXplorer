@@ -17,9 +17,15 @@ frame timeS = Pictures
     , Translate 0 0 demoRec
 
 	-- the tree
- 	, Translate 0 (-150) $	treeFrac 7 timeS
+ 	, Translate 0 (-150) $	treeFrac 3 timeS
 	]
 
+walker :: Picture 
+walker = Pictures 
+	[
+		Color green (rectangleSolid 10 10)
+		
+	]
 
 -- One of the red backing rectangles, with a white outline.
 backRec :: Picture
@@ -44,6 +50,14 @@ treeOutline	= makeColor 0.3 0.3 1.0 1.0
 treeColor :: Color
 treeColor	= makeColor 0.0 1.0 0.0 0.5
 
+
+randomWalker :: Int -> Int -> Float -> Picture
+randomWalker x y timeS = Pictures 
+	[
+		walker
+		, Translate x y 
+			
+	]
 
 -- The tree fractal.
 --	The position of the branches changes depending on the animation time
