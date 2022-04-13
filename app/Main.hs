@@ -4,6 +4,7 @@
 import Graphics.Gloss
 import System.Random
 
+type Point = (Float, Float)
 
 main :: IO ()
 main =  animate (InWindow "Zen" (800, 600) (5, 5)) (greyN 0.2) frame
@@ -58,13 +59,31 @@ newRandomPos x = 1 * x
 randomCoord :: IO Int
 randomCoord = getStdRandom $ randomR (-1, 1)
 
+picture :: [Point] -> Float -> Picture
+picture origin num = pictures [translate x y (circle 10) | (x,y) <- randomNext (round num) origin]
+
+
+nextRandoms :: Int -> [Point] -> [Point]
+nextRandoms seed origins =
+    let   add2d = (\(x1,y1) (x2,y2) -> (x1+x2, y1+y2))
+          count = length origins
+          range = (-5::Float, 5)
+          xs    = take count $ randomRs range (mkStdGen (seed+0))
+          ys    = take count $ randomRs range (mkStdGen (seed+1))
+    in
+          zipWith add2d  origins  (zip xs ys)
+
 randomWalker :: Int -> Int -> Float -> Picture
-randomWalker x y timeS= Pictures 
+randomWalker x y timeS = do
+	randX <- randomCoord
+	randY <- randomCoord
+	Pictures 
 	[
 		walker
 		, Translate (fromIntegral x) (fromIntegral y)
-			$ randomWalker (x + randomCoord) (y + randomCoord) timeS
+			$ randomWalker (x + randX) (y + randY) timeS
 	]
+	
 
 -- The tree fractal.
 --	The position of the branches changes depending on the animation time
