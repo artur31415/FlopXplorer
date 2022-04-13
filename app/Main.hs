@@ -55,13 +55,15 @@ treeColor	= makeColor 0.0 1.0 0.0 0.5
 newRandomPos :: Int -> Int
 newRandomPos x = 1 * x
 
+randomCoord :: IO Int
+randomCoord = getStdRandom $ randomR (-1, 1)
+
 randomWalker :: Int -> Int -> Float -> Picture
-randomWalker x y timeS = Pictures 
+randomWalker x y timeS= Pictures 
 	[
 		walker
-		, Translate x y
-			$ randomWalker (x + randomRIO (0,2) - 1) (y + randomRIO (0,2) - 1) timeS
-
+		, Translate (fromIntegral x) (fromIntegral y)
+			$ randomWalker (x + randomCoord) (y + randomCoord) timeS
 	]
 
 -- The tree fractal.
