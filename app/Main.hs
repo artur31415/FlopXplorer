@@ -4,7 +4,7 @@ import System.Random
 type PointF = (Float, Float)
 
 main :: IO ()
-main =  animate (InWindow "Zen" (800, 600) (5, 5)) (greyN 0.2) (picture [(1,2),(2,5),(4,7),(3,3)])--frame
+main =  animate (InWindow "Zen" (800, 600) (5, 5)) (greyN 0.2) (picture [(0, 0)])--frame
 
 -- Produce one frame of the animation.
 frame :: Float -> Picture
@@ -57,11 +57,11 @@ randomCoord :: IO Int
 randomCoord = getStdRandom $ randomR (-1, 1)
 
 picture :: [PointF] -> Float -> Picture
-picture origin timeS = pictures [translate x y (circle 10) | (x,y) <- nextRandoms (round timeS) origin]
+picture origin timeS = Pictures [translate x y (circle 10) | (x,y) <- nextRandoms1 (round timeS) origin]
 
 
-nextRandoms :: Int -> [PointF] -> [PointF]
-nextRandoms seed origins =
+nextRandoms1 :: Int -> [PointF] -> [PointF]
+nextRandoms1 seed origins =
     let   add2d = (\(x1,y1) (x2,y2) -> (x1+x2, y1+y2)) --FUNCTION
           count = length origins
           range = (-5::Float, 5)
@@ -70,6 +70,35 @@ nextRandoms seed origins =
     in
           zipWith add2d  origins  (zip xs ys)
 
+randomPointUpdates :: StdGen -> (Float, Float) -> Int -> ([PointF], StdGen)
+randomPointUpdates gen0 range count =
+    if (count <= 0)
+      then  ([], gen0)  -- generator unaltered
+      else
+        let  (dx, gen1)  = randomR range gen0 
+             (dy, gen2)  = randomR range gen1
+             point       = (dx, dy)
+             (rest, gen) = randomPointUpdates gen2 range (count-1)
+        in
+             (point : rest, gen)
+
+nextRandoms :: StdGen -> [PointF] -> ([PointF], StdGen)
+nextRandoms gen0 origins =
+    let   add2d   = (\(x1,y1) (x2,y2) -> (x1+x2, y1+y2))
+          count   = length origins
+          range   = (-5::Float, 5)
+
+          (changes, gen1) = randomPointUpdates gen0 range count
+          points = zipWith add2d  origins  changes 
+    in
+          (points, gen1)   
+
+randomPointSets :: StdGen -> [PointF] -> [[PointF]]
+randomPointSets gen0 origins =
+    let  (pts1, gen1) = nextRandoms gen0 origins
+    in   pts1 : (randomPointSets gen1 pts1)
+
+	
 -- randomWalker :: Int -> Int -> Float -> Picture
 -- randomWalker x y timeS = do
 -- 	randX <- randomCoord
