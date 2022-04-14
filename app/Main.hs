@@ -1,13 +1,10 @@
-
--- A nifty animated fractal of a tree, superimposed on a background 
---	of three red rectangles.
 import Graphics.Gloss
 import System.Random
 
-type Point = (Float, Float)
+type PointF = (Float, Float)
 
 main :: IO ()
-main =  animate (InWindow "Zen" (800, 600) (5, 5)) (greyN 0.2) frame
+main =  animate (InWindow "Zen" (800, 600) (5, 5)) (greyN 0.2) (picture [(1,2),(2,5),(4,7),(3,3)])--frame
 
 -- Produce one frame of the animation.
 frame :: Float -> Picture
@@ -59,13 +56,13 @@ newRandomPos x = 1 * x
 randomCoord :: IO Int
 randomCoord = getStdRandom $ randomR (-1, 1)
 
-picture :: [Point] -> Float -> Picture
-picture origin num = pictures [translate x y (circle 10) | (x,y) <- randomNext (round num) origin]
+picture :: [PointF] -> Float -> Picture
+picture origin timeS = pictures [translate x y (circle 10) | (x,y) <- nextRandoms (round timeS) origin]
 
 
-nextRandoms :: Int -> [Point] -> [Point]
+nextRandoms :: Int -> [PointF] -> [PointF]
 nextRandoms seed origins =
-    let   add2d = (\(x1,y1) (x2,y2) -> (x1+x2, y1+y2))
+    let   add2d = (\(x1,y1) (x2,y2) -> (x1+x2, y1+y2)) --FUNCTION
           count = length origins
           range = (-5::Float, 5)
           xs    = take count $ randomRs range (mkStdGen (seed+0))
@@ -73,16 +70,16 @@ nextRandoms seed origins =
     in
           zipWith add2d  origins  (zip xs ys)
 
-randomWalker :: Int -> Int -> Float -> Picture
-randomWalker x y timeS = do
-	randX <- randomCoord
-	randY <- randomCoord
-	Pictures 
-	[
-		walker
-		, Translate (fromIntegral x) (fromIntegral y)
-			$ randomWalker (x + randX) (y + randY) timeS
-	]
+-- randomWalker :: Int -> Int -> Float -> Picture
+-- randomWalker x y timeS = do
+-- 	randX <- randomCoord
+-- 	randY <- randomCoord
+-- 	Pictures 
+-- 	[
+-- 		walker
+-- 		, Translate (fromIntegral x) (fromIntegral y)
+-- 			$ randomWalker (x + randX) (y + randY) timeS
+-- 	]
 	
 
 -- The tree fractal.
