@@ -1,10 +1,12 @@
 import Graphics.Gloss
 import System.Random
 
+import Numeric
+
 type PointF = (Float, Float)
 
 main :: IO ()
-main =  animate (InWindow "Zen" (800, 600) (5, 5)) (greyN 0.2) (picture [(0, 0)])--frame
+main =  animate (InWindow "Zen" (800, 600) (5, 5)) (greyN 0.2) (picture2 [(0, 0)])--frame
 
 -- Produce one frame of the animation.
 frame :: Float -> Picture
@@ -59,6 +61,23 @@ randomCoord = getStdRandom $ randomR (-1, 1)
 picture :: [PointF] -> Float -> Picture
 picture origin timeS = Pictures [translate x y (circle 10) | (x,y) <- nextRandoms1 (round timeS) origin]
 
+
+
+picture2 :: [PointF] -> Float -> Picture
+picture2 origin timeS = 
+	let 
+		h : t = randomPointSets (mkStdGen 4243) origin
+		hp : tp = h
+		(x, y) = hp
+		xString = showGFloat (Just 2) x ""
+		yString = showGFloat (Just 2) y ""
+	in Pictures 
+	[
+		Translate (-350) (250) 
+		$ Scale 0.2 0.2
+		$ Text (xString ++ ", " ++ yString)
+		,	Translate x y (circle 5)
+	]
 
 nextRandoms1 :: Int -> [PointF] -> [PointF]
 nextRandoms1 seed origins =
